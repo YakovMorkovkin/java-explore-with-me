@@ -27,13 +27,13 @@ public class StatsController {
                                     @RequestParam(defaultValue = "false",
                                             required = false) boolean unique) {
         if (unique) {
-            if(uris==null) {
+            if (uris == null) {
                 return statsRepository.getStatisticsUniq(start, end);
             } else {
                 return statsRepository.getStatisticsUniqAndUris(start, end, uris);
             }
         } else {
-            if(uris==null) {
+            if (uris == null) {
                 return statsRepository.getStatistics(start, end);
             } else {
                 return statsRepository.getStatisticsUris(start, end, uris);
