@@ -27,14 +27,4 @@
         <org.projectlombok.version>1.18.26</org.projectlombok.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>ru.practicum</groupId>
-                <artifactId>stats-dto</artifactId>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-
 </project>
