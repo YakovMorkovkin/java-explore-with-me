@@ -7,6 +7,6 @@ import ru.practicum.statsdto.HitDtoIn;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface HitMapper {
-    @Mapping(source = "timestamp",target = "timestamp", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(source = "timestamp", target = "timestamp", dateFormat = "yyyy-MM-dd HH:mm:ss")
     Hit toModel(HitDtoIn hitDtoIn);
 }
