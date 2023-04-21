@@ -2,6 +2,7 @@ package ru.practicum.statsservice;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.statsdto.HitDtoIn;
 import ru.practicum.statsdto.HitDtoOut;
@@ -16,6 +17,7 @@ public class StatsController {
     private final HitMapper hitMapper;
 
     @PostMapping("/hit")
+    @ResponseStatus(HttpStatus.CREATED)
     public void save(@RequestBody HitDtoIn hitDtoIn) {
         statsRepository.save(hitMapper.toModel(hitDtoIn));
     }
