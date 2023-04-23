@@ -7,14 +7,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.Constants.DT_PATTERN;
+
 @Getter
 public class ErrorResponse {
     private List<String> errors;
     private final String status;
     private final String reason;
     private final String message;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = DT_PATTERN)
+    @JsonFormat(pattern = DT_PATTERN)
     private final LocalDateTime timestamp;
 
     public ErrorResponse(List<String> errors, String status, String reason, String message, LocalDateTime timestamp) {

@@ -11,6 +11,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static ru.practicum.statsservice.Constants.DT_PATTERN;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,8 +30,8 @@ public class Hit {
     private String uri;
     @Column(name = "ip")
     private String ip;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = DT_PATTERN)
+    @JsonFormat(pattern = DT_PATTERN)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @Column(name = "request_timestamp")

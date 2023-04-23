@@ -10,6 +10,8 @@ import ru.practicum.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 
+import static ru.practicum.Constants.DT_PATTERN;
+
 @Data
 @Builder
 public class EventFullDto {
@@ -21,11 +23,11 @@ public class EventFullDto {
     private Long confirmedRequests;
     @Length(min = 20, max = 7000)
     private String description;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = DT_PATTERN)
     private LocalDateTime eventDate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = DT_PATTERN)
     private LocalDateTime createdOn;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = DT_PATTERN)
     private LocalDateTime publishedOn;
     private LocationDto location;
     private boolean paid;

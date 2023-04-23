@@ -15,7 +15,6 @@ import ru.practicum.event.dto.mapper.LocationMapper;
 import ru.practicum.event.dto.outside.EventFullDto;
 import ru.practicum.event.dto.outside.EventShortDto;
 import ru.practicum.event.model.Event;
-import ru.practicum.event.model.Location;
 import ru.practicum.exception.notfound.CategoryNotFoundException;
 import ru.practicum.exception.notfound.EventNotFoundException;
 import ru.practicum.exception.notfound.NotFoundException;
@@ -29,9 +28,10 @@ import ru.practicum.user.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.practicum.Constants.DT_FORMATTER;
 
 @Service
 @Primary
@@ -51,9 +51,6 @@ public class EventServiceImpl implements EventService {
         LocalDateTime startTime;
         User initiator = userService.getUserCheked(userId);
         Event event = eventDtoMapper.toModel(newEventDto);
-        Location location = event.getLocation();
-        location = locationRepository.save(location);
-        event.setLocation(location);
         event.setState(State.PENDING.name());
         startTime = now.plusHours(2);
         if (event.getEventDate().isAfter(startTime)) {
@@ -100,7 +97,7 @@ public class EventServiceImpl implements EventService {
                 .app("EWM")
                 .ip(request.getRemoteAddr())
                 .uri(request.getRequestURI())
-                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .timestamp(LocalDateTime.now().format(DT_FORMATTER))
                 .build());
         return eventRepository.searchPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size).stream()
                 .map(eventDtoMapper::toShortDto)
@@ -146,7 +143,7 @@ public class EventServiceImpl implements EventService {
                 .app("EWM")
                 .ip(request.getRemoteAddr())
                 .uri(request.getRequestURI())
-                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .timestamp(LocalDateTime.now().format(DT_FORMATTER))
                 .build());
         event.setViews(event.getViews() + 1L);
         return eventDtoMapper.toFullDto(eventRepository.save(event));
@@ -172,7 +169,7 @@ public class EventServiceImpl implements EventService {
                         .orElseThrow(() -> new CategoryNotFoundException(updateEventDto.getCategory())) : event.getCategory())
                 .description(updateEventDto.getDescription() != null ? updateEventDto.getDescription() : event.getDescription())
                 .eventDate(updateEventDto.getEventDate() != null ? LocalDateTime.parse(updateEventDto.getEventDate(),
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : event.getEventDate())
+                        DT_FORMATTER) : event.getEventDate())
                 .createdOn(event.getCreatedOn())
                 .publishedOn(event.getPublishedOn())
                 .location(updateEventDto.getLocation() != null ? locationMapper.toModel(updateEventDto.getLocation()) :
@@ -191,9 +188,8 @@ public class EventServiceImpl implements EventService {
     }
 
     private LocalDateTime parseStringToLocalDateTime(String stringTime) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if (stringTime != null) {
-            return LocalDateTime.parse(stringTime, dateTimeFormatter);
+            return LocalDateTime.parse(stringTime, DT_FORMATTER);
         } else return null;
     }
 

@@ -7,12 +7,14 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+import static ru.practicum.Constants.DT_PATTERN;
+
 @Data
 @ToString
 @Builder
 public class ParticipationRequestDto {
     private Long id;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = DT_PATTERN)
     private LocalDateTime created;
     private Long event;
     private Long requester;

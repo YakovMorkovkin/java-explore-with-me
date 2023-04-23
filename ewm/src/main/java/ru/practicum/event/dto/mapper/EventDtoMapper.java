@@ -10,9 +10,11 @@ import ru.practicum.event.dto.outside.EventShortDto;
 import ru.practicum.event.model.Event;
 import ru.practicum.user.dto.mapper.UserDtoMapper;
 
+import static ru.practicum.Constants.DT_PATTERN;
+
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, uses = {UserDtoMapper.class, CategoryDtoMapper.class})
 public interface EventDtoMapper {
-    @Mapping(source = "eventDate", target = "eventDate", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(source = "eventDate", target = "eventDate", dateFormat = DT_PATTERN)
     @Mapping(source = "location", target = "location")
     @Mapping(source = "category", target = "category.id")
     Event toModel(NewEventDto newEventDto);

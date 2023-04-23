@@ -10,6 +10,8 @@ import ru.practicum.statsdto.HitDtoOut;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.statsservice.Constants.DT_PATTERN;
+
 @RestController
 @RequiredArgsConstructor
 public class StatsController {
@@ -23,8 +25,8 @@ public class StatsController {
     }
 
     @GetMapping("/stats")
-    public List<HitDtoOut> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+    public List<HitDtoOut> getStats(@RequestParam @DateTimeFormat(pattern = DT_PATTERN) LocalDateTime start,
+                                    @RequestParam @DateTimeFormat(pattern = DT_PATTERN) LocalDateTime end,
                                     @RequestParam(required = false) List<String> uris,
                                     @RequestParam(defaultValue = "false",
                                             required = false) boolean unique) {
