@@ -1,13 +1,13 @@
 package ru.practicum.event.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.practicum.category.dao.CategoryRepository;
 import ru.practicum.enums.State;
 import ru.practicum.enums.StateAction;
 import ru.practicum.event.dao.EventRepository;
-import ru.practicum.event.dao.LocationRepository;
 import ru.practicum.event.dto.in.NewEventDto;
 import ru.practicum.event.dto.in.UpdateEventDto;
 import ru.practicum.event.dto.mapper.EventDtoMapper;
@@ -33,12 +33,12 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.Constants.DT_FORMATTER;
 
+@Slf4j
 @Service
 @Primary
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
-    private final LocationRepository locationRepository;
     private final UserService userService;
     private final CategoryRepository categoryRepository;
     private final EventDtoMapper eventDtoMapper;
@@ -47,6 +47,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto addEvent(Long userId, NewEventDto newEventDto) {
+        log.info("Add event {}", newEventDto);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime;
         User initiator = userService.getUserCheked(userId);
@@ -64,17 +65,21 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getEvents(Long userId) {
+        log.info("Get events of user with id - {}", userId);
         return eventRepository.findAllByInitiatorId(userId).stream().map(eventDtoMapper::toShortDto).collect(Collectors.toList());
     }
 
     @Override
     public EventFullDto getEvent(Long userId, Long eventId) {
+        log.info("Get event with id - {}", eventId);
         return eventDtoMapper.toFullDto(eventRepository.findByInitiatorIdAndId(userId, eventId));
     }
 
     @Override
     public List<EventFullDto> getEventsByAdmin(List<Long> users, List<String> states, List<Long> categories,
                                                String rangeStart, String rangeEnd, Long from, Long size) {
+        log.info("Get events by admin with filters users - {}, states - {}, categories - {}, rangeStart - {}, rangeEnd - {}",
+                users, states, categories, rangeStart,rangeEnd);
         if (states != null) {
             return eventRepository.searchByAdmin(users, states, categories, parseStringToLocalDateTime(rangeStart),
                             parseStringToLocalDateTime(rangeEnd), from, size).stream()
@@ -92,6 +97,9 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, String rangeStart,
                                                String rangeEnd, Boolean onlyAvailable, String sort, Long from, Long size,
                                                HttpServletRequest request) {
+        log.info("Get events with filters text - {}, categories - {}, paid - {}, rangeStart - {}," +
+                        " rangeEnd - {}, onlyAvailable - {}, sort - {}",
+                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort);
 
         statsClient.addStats(HitDtoIn.builder()
                 .app("EWM")
@@ -107,6 +115,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto editEventByAdmin(Long eventId, UpdateEventDto updateEventDto) {
+        log.info("Edit event with id - {} by admin", eventId);
         Event event = getEventChecked(eventId);
         Event editedEvent = composeEvent(updateEventDto, event);
         if (editedEvent.getEventDate().isBefore(LocalDateTime.now())) {
@@ -125,6 +134,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto editEvent(Long userId, Long eventId, UpdateEventDto updateEventDto) {
+        log.info("Edit event with id - {} by user(id - {})", eventId, userId);
         userService.getUserCheked(userId);
         Event event = getEventChecked(eventId);
         Event editedEvent = composeEvent(updateEventDto, event);
@@ -138,6 +148,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getEventPublic(Long id, HttpServletRequest request) {
+        log.info("Get event with id - {})", id);
         Event event = getEventChecked(id);
         statsClient.addStats(HitDtoIn.builder()
                 .app("EWM")
@@ -156,6 +167,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event updateEvent(Event event) {
+        log.info("Update event with id - {})", event.getId());
         return eventRepository.save(event);
     }
 

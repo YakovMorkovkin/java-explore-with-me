@@ -1,6 +1,7 @@
 package ru.practicum.comment.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentDto addComment(Long userId, NewCommentDto commentDto) {
+        log.info("Add comment to event with id - {} from user with id-{}", commentDto.getEventId(), userId);
         User author = userService.getUserCheked(userId);
         Event event = eventService.getEventChecked(commentDto.getEventId());
         if (event.getState().equals(State.PUBLISHED.name())) {
@@ -53,6 +56,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteComment(Long userId, Long commentId) {
+        log.info("Delete comment with id - {}", commentId);
         User author = userService.getUserCheked(userId);
         Comment comment = getCheckedComment(commentId);
         if (comment.getAuthor().equals(author)) {
@@ -64,6 +68,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> publishComments(List<Long> commentsIds) {
+        log.info("Publish comment with ids - {}", commentsIds);
         List<Comment> allComments = commentRepository.findAllById(commentsIds);
         List<Comment> publishedComments = allComments.stream()
                 .filter(x -> !containsForbiddenWords(x.getText()))
@@ -80,12 +85,54 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> getComments(Long eventId, int page, int limit) {
+        log.info("Get comments for event with id - {}", eventId);
         getCheckedComment(eventId);
         List<Comment> comments = commentRepository.findByEventIdAndState(eventId, State.PUBLISHED.name(),
                 PageRequest.of(page, limit, Sort.by("id").descending()));
         return comments.stream()
                 .map(commentDtoMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CommentDto> getUserComments(Long userId, Long eventId, int page, int limit) {
+        log.info("Get user(id -{}) comments for event with id - {}", userId, eventId);
+        getCheckedComment(eventId);
+        List<Comment> comments = commentRepository.findByAuthor_IdAndEvent_Id(userId, eventId,
+                PageRequest.of(page, limit, Sort.by("id").descending()));
+        return comments.stream()
+                .map(commentDtoMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CommentDto updComment(Long userId, Long commentId, NewCommentDto commentDto) {
+        log.info("Update comment with id - {}", commentId);
+        User author = userService.getUserCheked(userId);
+        Comment comment = getCheckedComment(commentId);
+        if (!comment.getState().equals(State.PUBLISHED.name())) {
+            if (comment.getAuthor().getId().equals(userId)) {
+                Comment updComment = Comment.builder()
+                        .id(comment.getId())
+                        .text(commentDto.getText())
+                        .author(author)
+                        .event(comment.getEvent())
+                        .state(State.PENDING.name())
+                        .created(comment.getCreated())
+                        .build();
+                return commentDtoMapper.toDto(commentRepository.save(updComment));
+            } else {
+                throw new UnavailableException("Only author can edit the own comment");
+            }
+        } else {
+            throw new UnavailableException("Only not published comment can be edited");
+        }
+    }
+
+    @Override
+    public CommentDto getComment(Long commentId) {
+        log.info("Get comment with id - {}", commentId);
+        return commentDtoMapper.toDto(getCheckedComment(commentId));
     }
 
     private Comment getCheckedComment(Long id) {

@@ -22,4 +22,10 @@ public class CommentControllerPublic {
                                         @RequestParam(defaultValue = "10", required = false) int limit) {
         return commentService.getComments(eventId, page, limit);
     }
+
+    @GetMapping("/{commentId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CommentDto getComment(@PathVariable Long commentId) {
+        return commentService.getComment(commentId);
+    }
 }

@@ -1,6 +1,7 @@
 package ru.practicum.compilation.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import ru.practicum.exception.notfound.CompilationNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
+        log.info("Add compilation {}", newCompilationDto.getTitle());
         Compilation compilation = compilationDtoMapper.toModel(newCompilationDto);
         compilation.setEvents(eventRepository.findAllById(newCompilationDto.getEvents()));
         return compilationDtoMapper.toDto(compilationRepository.save(compilation));
@@ -33,11 +36,13 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto getComp(long id) {
+        log.info("Add compilation with id - {}", id);
         return compilationDtoMapper.toDto(getCheckedComp(id));
     }
 
     @Override
     public List<CompilationDto> getComps(Boolean pinned, Long from, Long size) {
+        log.info("Add compilations with filters pinned - {}", pinned);
         return compilationRepository.findComps(pinned, from, size).stream()
                 .map(compilationDtoMapper::toDto)
                 .collect(Collectors.toList());
@@ -45,12 +50,14 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public void delComp(long compId) {
+        log.info("Delete compilation with id - {}", compId);
         getCheckedComp(compId);
         compilationRepository.deleteById(compId);
     }
 
     @Override
     public CompilationDto updateCompilation(Long id, NewCompilationDto newCompilationDto) {
+        log.info("Update compilation with id - {}", id);
         Compilation compilation = getCheckedComp(id);
         Compilation result = composeComp(compilation, newCompilationDto);
         result.setEvents(eventRepository.findAllById(newCompilationDto.getEvents()));

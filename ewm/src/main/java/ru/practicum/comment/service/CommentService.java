@@ -16,4 +16,10 @@ public interface CommentService {
     List<CommentDto> publishComments(List<Long> commentsIds);
 
     List<CommentDto> getComments(Long eventId, int page, int limit);
+
+    List<CommentDto> getUserComments(Long userId, Long eventId, int page, int limit);
+
+    CommentDto updComment(Long userId, Long commentId, NewCommentDto newCommentDto);
+
+    CommentDto getComment(Long commentId);
 }

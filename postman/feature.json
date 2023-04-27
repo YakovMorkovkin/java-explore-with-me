@@ -328,6 +328,119 @@
 			"response": []
 		},
 		{
+			"name": "edit Comment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function() {\r",
+							"    pm.response.to.be.success; // код ответа должен быть равен успех\r",
+							"    pm.response.to.be.withBody; // ответ должен содержать тело\r",
+							"    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
+							"});\r",
+							"\r",
+							"const comment = pm.response.json();\r",
+							"pm.test(\"Комментарий должен содержать поля: id, author, eventId, text, state, created\", function () {\r",
+							"pm.expect(comment).to.have.property('id');\r",
+							"pm.expect(comment).to.have.property('author');\r",
+							"pm.expect(comment).to.have.property('eventId');\r",
+							"pm.expect(comment).to.have.property('text');\r",
+							"pm.expect(comment).to.have.property('state');\r",
+							"pm.expect(comment).to.have.property('created');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"text\": \"test comment1 from user with this Id update\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/:userId/comments/:commentId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						":userId",
+						"comments",
+						":commentId"
+					],
+					"variable": [
+						{
+							"key": "userId",
+							"value": "2"
+						},
+						{
+							"key": "commentId",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Comment id=2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function() {\r",
+							"    pm.response.to.be.success; // код ответа должен быть равен успех\r",
+							"    pm.response.to.be.withBody; // ответ должен содержать тело\r",
+							"    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
+							"});\r",
+							"\r",
+							"const comment = pm.response.json();\r",
+							"pm.test(\"Комментарий должен содержать поля: id, author, eventId, text, state, created\", function () {\r",
+							"pm.expect(comment).to.have.property('id');\r",
+							"pm.expect(comment).to.have.property('author');\r",
+							"pm.expect(comment).to.have.property('eventId');\r",
+							"pm.expect(comment).to.have.property('text');\r",
+							"pm.expect(comment).to.have.property('state');\r",
+							"pm.expect(comment).to.have.property('created');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/comments/:commentId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"comments",
+						":commentId"
+					],
+					"variable": [
+						{
+							"key": "commentId",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Add correct Comment forbidden word",
 			"event": [
 				{
@@ -498,6 +611,58 @@
 						{
 							"key": "userId",
 							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all user Comments for Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json(); // получаем тело ответа в формате json\r",
+							"\r",
+							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function() {\r",
+							"    pm.response.to.be.success; // код ответа должен быть равен успех\r",
+							"    pm.response.to.be.withBody; // ответ должен содержать тело\r",
+							"    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Тело ответа должно быть массивом и количество элементов 2\", ()=> {\r",
+							"    pm.expect(body).is.an('array'); // проверяем что тело ответа является массивом\r",
+							"    pm.expect(body.length).to.be.gte(1); // проверяем что длина массива больше 1\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/:userId/comments/:eventId",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						":userId",
+						"comments",
+						":eventId"
+					],
+					"variable": [
+						{
+							"key": "userId",
+							"value": "2"
+						},
+						{
+							"key": "eventId",
+							"value": "1"
 						}
 					]
 				}

@@ -1,6 +1,7 @@
 package ru.practicum.participationrequest.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.practicum.enums.State;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public List<ParticipationRequestDto> getRequests(Long userId) {
+        log.info("Get requests of user with id {}", userId);
         return participationRequestRepository.findAllByRequesterId(userId).stream()
                 .map(participationRequestDtoMapper::toDto)
                 .collect(Collectors.toList());
@@ -46,6 +49,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public List<ParticipationRequestDto> getRequestsEventForInitiator(Long userId, Long eventId) {
+        log.info("Get requests for event with id {} of initiator ", eventId);
         if (eventService.getEventChecked(eventId).getInitiator().getId().equals(userId)) {
             return participationRequestRepository.findByEventId(eventId)
                     .stream()
@@ -56,6 +60,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public ParticipationRequestDto addRequest(Long userId, Long eventId) {
+        log.info("Add request from user with id {} to event with id {} ", userId, eventId);
         Optional<ParticipationRequest> request = participationRequestRepository.findByRequesterIdAndEventId(userId, eventId);
         if (request.isPresent()) {
             throw new RequestDuplicateException(request.get().getId());
@@ -95,6 +100,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
+        log.info("Cancel request with id {} by user with id {} ", requestId, userId);
         ParticipationRequest participationRequest = getParticipationRequestChecked(requestId);
         if (participationRequest.getRequester().getId().equals(userId)) {
             participationRequest.setStatus(State.CANCELED.name());
@@ -104,6 +110,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public RequestsStatusDto changeStatus(Long userId, Long eventId, NewRequestsStatusDto newRequestsStatusDto) {
+        log.info("Change status of request {}", newRequestsStatusDto);
         RequestsStatusDto requestsStatusDto = RequestsStatusDto.builder().build();
         Event event = eventService.getEventChecked(eventId);
         List<ParticipationRequest> confirmedRqsts = new ArrayList<>();
