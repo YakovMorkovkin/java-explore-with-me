@@ -1,6 +1,7 @@
 package ru.practicum.category.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -19,6 +20,7 @@ import ru.practicum.exception.notfound.CategoryNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
+        log.info("Add category {}", newCategoryDto.getName());
         try {
             return categoryDtoMapper.toDto(categoryRepository.save(categoryDtoMapper.toModel(newCategoryDto)));
         } catch (DataIntegrityViolationException e) {
@@ -39,7 +42,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long catId) {
-        Category category = getCategoryChecked(catId);
+        log.info("Delete category with id - {}", catId);
+        getCategoryChecked(catId);
         if (eventRepository.findAllByCategoryId(catId).isEmpty()) {
             categoryRepository.deleteById(catId);
         } else {
@@ -49,6 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto updateCategory(Long catId, NewCategoryDto newCategoryDto) {
+        log.info("Update category with id - {}", catId);
         try {
             Category category = getCategoryChecked(catId);
             category.setName(newCategoryDto.getName());
@@ -60,6 +65,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> getCategorys(Long from, Long size) {
+        log.info("Get categories");
         return categoryRepository.findWithParams(from, size).stream()
                 .map(categoryDtoMapper::toDto)
                 .collect(Collectors.toList());
@@ -67,6 +73,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategory(Long catId) {
+        log.info("Get category with id - {}", catId);
         return categoryDtoMapper.toDto(getCategoryChecked(catId));
     }
 
